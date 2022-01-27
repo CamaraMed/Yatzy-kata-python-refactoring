@@ -1,221 +1,146 @@
-class Yatzy:
-
-    @staticmethod
-    def chance(d1, d2, d3, d4, d5):
-        total = 0
-        total += d1
-        total += d2
-        total += d3
-        total += d4
-        total += d5
-        return total
-
-    @staticmethod
-    def yatzy(dice):
-        counts = [0] * (len(dice) + 1)
-        for die in dice:
-            counts[die - 1] += 1
-        for i in range(len(counts)):
-            if counts[i] == 5:
-                return 50
-        return 0
-
-    @staticmethod
-    def ones(d1, d2, d3, d4, d5):
-        sum = 0
-        if (d1 == 1):
-            sum += 1
-        if (d2 == 1):
-            sum += 1
-        if (d3 == 1):
-            sum += 1
-        if (d4 == 1):
-            sum += 1
-        if (d5 == 1):
-            sum += 1
-
-        return sum
-
-    @staticmethod
-    def twos(d1, d2, d3, d4, d5):
-        sum = 0
-        if (d1 == 2):
-            sum += 2
-        if (d2 == 2):
-            sum += 2
-        if (d3 == 2):
-            sum += 2
-        if (d4 == 2):
-            sum += 2
-        if (d5 == 2):
-            sum += 2
-        return sum
-
-    @staticmethod
-    def threes(d1, d2, d3, d4, d5):
-        s = 0
-        if (d1 == 3):
-            s += 3
-        if (d2 == 3):
-            s += 3
-        if (d3 == 3):
-            s += 3
-        if (d4 == 3):
-            s += 3
-        if (d5 == 3):
-            s += 3
-        return s
-
-    def __init__(self, d1, d2, d3, d4, _5):
+# we create this class to prevent the repetition of dice in the different functions
+class Hand:
+    def __init__(self, d1, d2, d3, d4, d5):
         self.dice = [0] * 5
         self.dice[0] = d1
         self.dice[1] = d2
         self.dice[2] = d3
         self.dice[3] = d4
-        self.dice[4] = _5
+        self.dice[4] = d5
 
-    def fours(self):
-        sum = 0
-        for at in range(5):
-            if (self.dice[at] == 4):
-                sum += 4
-        return sum
 
-    def fives(self):
-        s = 0
-        i = 0
-        for i in range(len(self.dice)):
-            if (self.dice[i] == 5):
-                s = s + 5
-        return s
+"""this function will be used in scoring functions section. We define it so that we can reuse it and remove 
+redundancy from scoring computing"""
+def score(hand, number):
+    sum = 0
+    for die in hand.dice:
+        if die == number:
+            sum += die
+    return sum
 
-    def sixes(self):
-        sum = 0
-        for at in range(len(self.dice)):
-            if (self.dice[at] == 6):
-                sum = sum + 6
-        return sum
 
-    @staticmethod
-    def one_pair(d1, d2, d3, d4, d5):
-        counts = [0] * 6
-        counts[d1 - 1] += 1
-        counts[d2 - 1] += 1
-        counts[d3 - 1] += 1
-        counts[d4 - 1] += 1
-        counts[d5 - 1] += 1
-        at = 0
-        for at in range(6):
-            if (counts[6 - at - 1] == 2):
-                return (6 - at) * 2
-        return 0
+# this function will be used in three of a kind and four of a kind section. Its purpose is to remove redundancy
+def number_of_a_kind(hand, number):
+    # Initialisation of all dice values to 0 in a dictionary
+    counts = dict.fromkeys(range(1, 7), 0)
+
+    # counting the occurrence of each dice
+    for value in hand.dice:
+        counts[value] = counts[value] + 1
+
+    for key in reversed(range(1, 7)):
+        if counts[key] >= number:
+            return key * number
+    return 0
+
+
+class Yatzy:
 
     @staticmethod
-    def two_pairs(d1, d2, d3, d4, d5):
-        counts = [0] * 6
-        counts[d1 - 1] += 1
-        counts[d2 - 1] += 1
-        counts[d3 - 1] += 1
-        counts[d4 - 1] += 1
-        counts[d5 - 1] += 1
-        n = 0
-        score = 0
-        for i in range(6):
-            if (counts[6 - i - 1] >= 2):
-                n = n + 1
-                score += (6 - i)
+    def chance(d1, d2, d3, d4, d5):
+        return d1 + d2 + d3 + d4 + d5
 
-        if (n == 2):
-            return score * 2
+    @staticmethod
+    def yatzy(dice):
+        # Checking if all the element are similar to the first element of the list. if yes return 50 otherwise
+        # return 0, we can also use count function by comparing the occurrences of the first element to len of list
+        if all(element == dice[0] for element in dice):
+            return 50
         else:
             return 0
 
     @staticmethod
-    def three_of_a_kind(d1, d2, d3, d4, d5):
-        t = [0] * 6
-        t[d1 - 1] += 1
-        t[d2 - 1] += 1
-        t[d3 - 1] += 1
-        t[d4 - 1] += 1
-        t[d5 - 1] += 1
-        for i in range(6):
-            if (t[i] >= 3):
-                return (i + 1) * 3
+    def ones(hand):
+        # We used the score function defined at the beginning
+        return score(hand, 1)
+
+    @staticmethod
+    def twos(hand):
+        # We reused the score function defined at the beginning
+        return score(hand, 2)
+
+    @staticmethod
+    def threes(hand):
+        # We reused the score function defined at the beginning
+        return score(hand, 3)
+
+    @staticmethod
+    def fours(hand):
+        # We reused the score function defined at the beginning
+        return score(hand, 4)
+
+    @staticmethod
+    def fives(hand):
+        # We reused the score function defined at the beginning
+        return score(hand, 5)
+
+    @staticmethod
+    def sixes(hand):
+        # We reused the score function defined at the beginning
+        return score(hand, 6)
+
+    @staticmethod
+    def one_pair(hand):
+        # Initialisation of all dice values to 0 in a dictionary
+        counts = dict.fromkeys(range(1, 7), 0)
+
+        # counting the occurrence of each dice
+        for value in hand.dice:
+            counts[value] = counts[value] + 1
+
+        for key in reversed(range(1, 7)):
+            if counts[key] >= 2:
+                return key * 2
         return 0
 
     @staticmethod
-    def four_of_a_kind(_1, _2, d3, d4, d5):
-        tallies = [0] * 6
-        tallies[_1 - 1] += 1
-        tallies[_2 - 1] += 1
-        tallies[d3 - 1] += 1
-        tallies[d4 - 1] += 1
-        tallies[d5 - 1] += 1
-        for i in range(6):
-            if (tallies[i] >= 4):
-                return (i + 1) * 4
-        return 0
+    def two_pairs(hand):
+        counts = dict.fromkeys(range(1, 7), 0)
+        for value in hand.dice:
+            counts[value] = counts[value] + 1
 
-   
-    @staticmethod
-    def small_straight(d1, d2, d3, d4, d5):
-        tallies = [0] * 6
-        tallies[d1 - 1] += 1
-        tallies[d2 - 1] += 1
-        tallies[d3 - 1] += 1
-        tallies[d4 - 1] += 1
-        tallies[d5 - 1] += 1
-        if (tallies[0] == 1 and
-                tallies[1] == 1 and
-                tallies[2] == 1 and
-                tallies[3] == 1 and
-                tallies[4] == 1):
-            return 15
+        # variable to check weather the number of pairs is equal to 1 or 2
+        number_of_pairs = 0
+
+        # variable to stock the score
+        sum_of_scores = 0
+        for key in reversed(range(1, 7)):
+            if counts[key] >= 2:
+                number_of_pairs += 1
+                sum_of_scores += key * 2
+        if number_of_pairs == 2:
+            return sum_of_scores
         return 0
 
     @staticmethod
-    def large_straight(d1, d2, d3, d4, d5):
-        tallies = [0] * 6
-        tallies[d1 - 1] += 1
-        tallies[d2 - 1] += 1
-        tallies[d3 - 1] += 1
-        tallies[d4 - 1] += 1
-        tallies[d5 - 1] += 1
-        if (tallies[1] == 1 and
-                tallies[2] == 1 and
-                tallies[3] == 1 and
-                tallies[4] == 1
-                and tallies[5] == 1):
-            return 20
-        return 0
+    def three_of_a_kind(hand):
+        return number_of_a_kind(hand, 3)
 
     @staticmethod
-    def full_house(d1, d2, d3, d4, d5):
-        tallies = []
-        _2 = False
-        i = 0
-        _2_at = 0
-        _3 = False
-        _3_at = 0
+    def four_of_a_kind(hand):
+        return number_of_a_kind(hand, 4)
 
-        tallies = [0] * 6
-        tallies[d1 - 1] += 1
-        tallies[d2 - 1] += 1
-        tallies[d3 - 1] += 1
-        tallies[d4 - 1] += 1
-        tallies[d5 - 1] += 1
-
-        for i in range(6):
-            if (tallies[i] == 2):
-                _2 = True
-                _2_at = i + 1
-
-        for i in range(6):
-            if (tallies[i] == 3):
-                _3 = True
-                _3_at = i + 1
-
-        if (_2 and _3):
-            return _2_at * 2 + _3_at * 3
-        else:
+    @staticmethod
+    # The purpose of small straight is to check if the elements of the dice are 1, 2, 3, 4, 5 if no we return 0
+    # otherwise we return 15, so we can use sort method in order to compare the dice list to [1, 2, 3, 4, 5]
+    def small_straight(hand):
+        hand.dice.sort()
+        if hand.dice != [1, 2, 3, 4, 5]:
             return 0
+        return 15
+
+    @staticmethod
+    # We apply the same thing as we did in small straight
+    def large_straight(hand):
+        hand.dice.sort()
+        if hand.dice != [2, 3, 4, 5, 6]:
+            return 0
+        return 20
+
+    @staticmethod
+    def full_house(hand):
+        two_of_a_kind_score = number_of_a_kind(hand, 2)
+        three_of_a_kind_score = number_of_a_kind(hand, 3)
+        if (two_of_a_kind_score != 0) and (three_of_a_kind_score != 0):
+            return two_of_a_kind_score + three_of_a_kind_score
+        return 0
